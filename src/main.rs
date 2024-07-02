@@ -1,4 +1,4 @@
-use std::{f32::consts::PI,};
+use std::{f32::consts::PI, iter::Enumerate};
 
 use macroquad::prelude::*;
 
@@ -11,11 +11,13 @@ async fn main() {
         CAlignment::Horizontal,
     );
 
-    let mut os_con = ContainerOscilator::new();
+    let mut os_con = ContainerOscilator::new(50.0);
     os_con.add_osci(os);
 
+    os_con.order_oscilators();
+
     loop {
-        // os.update();
+        os_con.update();
         os_con.draw();
 
         next_frame().await;
@@ -80,13 +82,15 @@ impl Oscilator {
 struct ContainerOscilator {
     hori_oscis: Vec<Oscilator>,
     verti_oscis: Vec<Oscilator>,
+    size: f32,
 }
 
 impl ContainerOscilator {
-    fn new() -> Self {
+    fn new(size: f32) -> Self {
         Self {
             hori_oscis: Vec::new(),
             verti_oscis: Vec::new(),
+            size,
         }
     }
 
@@ -94,6 +98,26 @@ impl ContainerOscilator {
         match new_osci.ali {
             CAlignment::Horizontal => self.hori_oscis.push(new_osci),
             CAlignment::Vertical => self.verti_oscis.push(new_osci),
+        }
+    }
+
+    fn order_oscilators(&mut self) {
+        self.hori_oscis.iter_mut().enumerate().for_each(|tup| {
+            let i = tup.0 as f32;
+            let osci = tup.1;
+
+            osci.size = self.size;
+            osci.center = Vec2::new((self.size * i + 1.0), self.size / 2.0);
+        });
+    }
+
+    fn update(&mut self) {
+        for osci in &mut self.hori_oscis {
+            osci.update();
+        }
+
+        for osci in &mut self.verti_oscis {
+            osci.update();
         }
     }
 
