@@ -26,16 +26,18 @@ impl Oscilator {
     }
 
     pub fn draw(&self) {
-        circle(
-            self.center,
-            self.size * 0.5 * 0.8,
-            Color {
-                r: 1.0,
-                g: 1.0,
-                b: 1.0,
-                a: 0.15,
-            },
-        );
+        // circle(
+        //     self.center,
+        //     self.size * 0.5 * 0.8,
+        //     Color {
+        //         r: 1.0,
+        //         g: 1.0,
+        //         b: 1.0,
+        //         a: 0.15,
+        //     },
+        // );
+
+        draw_circle_lines(self.center.x, self.center.y, self.size * 0.8 * 0.5, 1.0, WHITE);
 
         draw_circle(self.pol_cord.x, self.pol_cord.y, 2.0, WHITE);
 
@@ -83,8 +85,9 @@ impl Oscilator {
         }
     }
 
-    pub fn update(&mut self) {
-        self.cur_angle += self.speed;
+    pub fn update(&mut self, angle: f32) {
+        self.cur_angle = self.speed * angle;
         self.pol_cord = Vec2::from_angle(self.cur_angle) * self.size * 0.8 * 0.5 + self.center;
+        println!("{}", self.pol_cord.length());
     }
 }
