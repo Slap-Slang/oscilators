@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use macroquad::{
     color::{WHITE, YELLOW},
     math::Vec2,
@@ -12,7 +14,7 @@ pub struct ContainerOscilator {
     hori_oscis: Vec<Oscilator>,
     verti_oscis: Vec<Oscilator>,
     size: f32,
-    patterns: Vec<Vec<Vec2>>,
+    pub patterns: Vec<Vec<Vec2>>,
 }
 
 impl ContainerOscilator {
@@ -30,7 +32,6 @@ impl ContainerOscilator {
             CAlignment::Horizontal => self.hori_oscis.push(new_osci),
             CAlignment::Vertical => self.verti_oscis.push(new_osci),
         }
-        self.patterns.push(Vec::new());
     }
 
     pub fn order_oscilators(&mut self) {
@@ -49,6 +50,16 @@ impl ContainerOscilator {
             osci.size = self.size;
             osci.center = Vec2::new(self.size / 2.0, self.size / 2.0 + self.size * (i + 1.0));
         });
+
+        self.hori_oscis.iter().for_each(|hor_osci| {
+            self.verti_oscis.iter().for_each(|verti_osci| {
+                let pattern_size = (2.0 * PI / hor_osci.speed) * (2.0 * PI / verti_osci.speed) / 100.0;
+                let new_pattern = vec![Vec2::new(pattern_size, 0.0)];
+                self.patterns.push(new_pattern);
+                println!("{pattern_size}");
+            });
+            println!();
+        })
     }
 
     pub fn update(&mut self) {
@@ -68,7 +79,9 @@ impl ContainerOscilator {
             let j = 0;
             for v_osci in &self.verti_oscis {
                 draw_circle_lines(h_osci.pol_cord.x, v_osci.pol_cord.y, 1.0, 1.0, YELLOW);
-                self.patterns[i * j + i].push(Vec2::new(h_osci.pol_cord.x, v_osci.pol_cord.y));
+                if self.patterns[i * j + i][0].x > self.patterns[i * j + i].len() as f32 {
+                    self.patterns[i * j + i].push(Vec2::new(h_osci.pol_cord.x, v_osci.pol_cord.y));
+                }
             }
         }
 

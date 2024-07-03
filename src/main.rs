@@ -24,6 +24,7 @@ async fn main() {
     }
 
     os_con.order_oscilators();
+    println!("{}", os_con.patterns.len());
 
     loop {
         os_con.update();
